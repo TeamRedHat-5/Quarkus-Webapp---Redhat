@@ -1,16 +1,33 @@
 package uk.ac.newcastle.enterprisemiddleware.booking;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.smallrye.common.constraint.NotNull;
-import uk.ac.newcastle.enterprisemiddleware.customer.*;
-import uk.ac.newcastle.enterprisemiddleware.flight.*;
-import javax.persistence.*;
-import javax.validation.constraints.Future;
-import javax.validation.constraints.Past;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Future;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.acme.domain.model.BaseEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.smallrye.common.constraint.NotNull;
+import uk.ac.newcastle.enterprisemiddleware.customer.Customer;
+import uk.ac.newcastle.enterprisemiddleware.flight.Flight;
 
 /**
  * <p>This is a the Domain object. The Booking class represents how booking resources are represented in the application
@@ -33,7 +50,7 @@ import java.util.Objects;
 })
 @XmlRootElement
 @Table(name = "booking", uniqueConstraints = @UniqueConstraint(columnNames = {"flightId", "bookingDate" }))
-public class Booking implements Serializable {
+public class Booking extends BaseEntity implements Serializable {
 
 
     private static final long serialVersionUID = 1L;

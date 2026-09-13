@@ -1,16 +1,30 @@
 package uk.ac.newcastle.enterprisemiddleware.flight;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.smallrye.common.constraint.NotNull;
-import uk.ac.newcastle.enterprisemiddleware.booking.Booking;
-
-import javax.persistence.*;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.acme.domain.model.BaseEntity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import io.smallrye.common.constraint.NotNull;
+import uk.ac.newcastle.enterprisemiddleware.booking.Booking;
 
 /**
  * <p>This is a the Domain object. The Flight class represents how flight resources are represented in the application
@@ -28,7 +42,7 @@ import java.util.Objects;
         @NamedQuery(name = Flight.FIND_BY_FLIGHT_NUMBER, query = "SELECT c FROM Flight c WHERE c.flightNumber = :flightNumber")
 })
 @Table(name = "Flight", uniqueConstraints = @UniqueConstraint(columnNames = "flightNumber"))
-public class Flight implements Serializable {
+public class Flight extends BaseEntity implements Serializable {
     /** Default value included to remove warning. Remove or modify at will. **/
     private static final long serialVersionUID = 1L;
 

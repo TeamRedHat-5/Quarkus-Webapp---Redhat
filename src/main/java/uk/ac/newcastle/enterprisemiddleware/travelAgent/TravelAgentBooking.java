@@ -1,14 +1,20 @@
 package uk.ac.newcastle.enterprisemiddleware.travelAgent;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import uk.ac.newcastle.enterprisemiddleware.booking.Booking;
-
-import javax.persistence.*;
-import javax.validation.constraints.*;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.acme.domain.model.BaseEntity;
 
 
 @Entity
@@ -18,7 +24,7 @@ import java.util.Objects;
 })
 @XmlRootElement
 @Table(name = "TravelAgentBooking", uniqueConstraints = @UniqueConstraint(columnNames = "id"))
-public class TravelAgentBooking implements Serializable {
+public class TravelAgentBooking extends BaseEntity implements Serializable {
 
     public static final String FIND_ALL = "TravelAgentBooking.findAll";
     public static final String Find_BY_ID = "TravelAgentBooking.findById";
