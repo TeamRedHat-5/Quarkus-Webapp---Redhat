@@ -14,6 +14,7 @@ import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -129,8 +130,8 @@ public class CustomerRestService {
     @Transactional
     public Response createCustomer(
             @Parameter(description = "JSON representation of Customer object to be added to the database", required = true)
+            @Valid
             Customer Customer) {
-
         if (Customer == null) {
             throw new RestServiceException("Bad Request", Response.Status.BAD_REQUEST);
         }

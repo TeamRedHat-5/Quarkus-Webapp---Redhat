@@ -4,7 +4,11 @@ import uk.ac.newcastle.enterprisemiddleware.util.RestServiceException;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -26,12 +30,22 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         int status = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
         String error = Response.Status.INTERNAL_SERVER_ERROR.getReasonPhrase();
         String message = "An unexpected error occurred while processing the request.";
+        Map<String, String> reasons = new HashMap<>();
 
-        if (exception instanceof RestServiceException) {
+        if (exception instanceof ConstraintViolationException) {
+            ConstraintViolationException cve = (ConstraintViolationException) exception;
+            status = Response.Status.BAD_REQUEST.getStatusCode();
+            error = Response.Status.BAD_REQUEST.getReasonPhrase();
+            message = "Validation failed for one or more fields";
+            for (ConstraintViolation<?> violation : cve.getConstraintViolations()) {
+                reasons.put(violation.getPropertyPath().toString(), violation.getMessage());
+            }
+        } else if (exception instanceof RestServiceException) {
             RestServiceException restException = (RestServiceException) exception;
             status = restException.getStatus().getStatusCode();
             error = restException.getStatus().getReasonPhrase();
             message = restException.getMessage();
+            reasons = restException.getReasons();
         } else if (exception instanceof WebApplicationException) {
             WebApplicationException webException = (WebApplicationException) exception;
             status = webException.getResponse().getStatus();
@@ -51,7 +65,8 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
                 status,
                 error,
                 message,
-                uriInfo.getRequestUri().getPath()
+                uriInfo.getRequestUri().getPath(),
+                reasons
         );
 
         return Response.status(status)
