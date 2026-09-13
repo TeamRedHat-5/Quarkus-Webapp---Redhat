@@ -13,6 +13,7 @@ import javax.inject.Named;
 import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -98,6 +99,7 @@ public class FlightRestService {
     })
     @Transactional
     public Response createFlight(@Parameter(description = "JSON representation of Flight object to be added to the database", required = true)
+                                     @Valid
                                      Flight flight){
         if (flight == null) {
             throw new RestServiceException("Bad Request", Response.Status.BAD_REQUEST);
