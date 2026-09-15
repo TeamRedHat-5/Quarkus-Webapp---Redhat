@@ -4,11 +4,16 @@ import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
 @MappedSuperclass
 public abstract class BaseEntity {
+
+    @Version
+    @Column(name = "version")
+    private Long version;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -34,5 +39,13 @@ public abstract class BaseEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

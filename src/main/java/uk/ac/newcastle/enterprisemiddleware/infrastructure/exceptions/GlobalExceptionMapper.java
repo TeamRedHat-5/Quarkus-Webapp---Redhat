@@ -2,6 +2,7 @@ package uk.ac.newcastle.enterprisemiddleware.infrastructure.exceptions;
 
 import uk.ac.newcastle.enterprisemiddleware.util.RestServiceException;
 
+import javax.persistence.OptimisticLockException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
@@ -44,6 +45,10 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
                 error = "Request Error";
                 message = "The request could not be processed.";
             }
+        } else if (hasOptimisticLockCause(exception)) {
+            status = Response.Status.CONFLICT.getStatusCode();
+            error = Response.Status.CONFLICT.getReasonPhrase();
+            message = "The resource was modified by another request. Please reload and try again.";
         }
 
         ErrorResponseDTO responseBody = new ErrorResponseDTO(
@@ -58,5 +63,16 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
                 .type(MediaType.APPLICATION_JSON)
                 .entity(responseBody)
                 .build();
+    }
+
+    private boolean hasOptimisticLockCause(Throwable exception) {
+        Throwable cause = exception;
+        while (cause != null) {
+            if (cause instanceof OptimisticLockException) {
+                return true;
+            }
+            cause = cause.getCause();
+        }
+        return false;
     }
 }
