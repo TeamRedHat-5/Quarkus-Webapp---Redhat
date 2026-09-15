@@ -1,20 +1,26 @@
 package uk.ac.newcastle.enterprisemiddleware.contact;
 
+import java.util.Calendar;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
-
-import java.util.Calendar;
-
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.restassured.specification.RequestSpecification;
 
 @QuarkusTest
 @TestHTTPEndpoint(ContactRestService.class)
@@ -24,8 +30,13 @@ class ContactRestServiceIntegrationTest {
 
     private static Contact contact;
 
+        private static RequestSpecification when() {
+                return given().header("X-API-KEY", "change-me");
+        }
+
     @BeforeAll
     static void setup() {
+
         contact = new Contact();
         contact.setFirstName("Test");
         contact.setLastName("Account");
@@ -34,6 +45,11 @@ class ContactRestServiceIntegrationTest {
         contact.setPhoneNumber("(201) 123-4567");
         contact.setState("New Jersey");
     }
+
+        @BeforeEach
+        void configureApiKey() {
+                RestAssured.filters(new org.acme.infrastructure.security.ApiKeyRequestFilter());
+        }
 
     @Test
     @Order(1)

@@ -5,11 +5,17 @@ import static org.hamcrest.Matchers.notNullValue;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
 import io.restassured.http.ContentType;
 
 @QuarkusTest
 class GlobalExceptionMapperTest {
+
+    @org.junit.jupiter.api.BeforeEach
+    static void configureApiKey() {
+        RestAssured.filters(new org.acme.infrastructure.security.ApiKeyRequestFilter());
+    }
 
     @Test
     void restServiceExceptionReturnsStructuredJsonError() {

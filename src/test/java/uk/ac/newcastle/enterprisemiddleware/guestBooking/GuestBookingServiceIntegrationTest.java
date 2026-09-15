@@ -1,28 +1,24 @@
 package uk.ac.newcastle.enterprisemiddleware.guestBooking;
-import io.quarkus.test.common.QuarkusTestResource;
-import io.quarkus.test.common.http.TestHTTPEndpoint;
-import io.quarkus.test.h2.H2DatabaseTestResource;
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
-import uk.ac.newcastle.enterprisemiddleware.booking.Booking;
-import uk.ac.newcastle.enterprisemiddleware.contact.ContactRestService;
-import uk.ac.newcastle.enterprisemiddleware.flight.Flight;
-import uk.ac.newcastle.enterprisemiddleware.flight.FlightRestService;
-import uk.ac.newcastle.enterprisemiddleware.guestbooking.GuestBooking;
-import uk.ac.newcastle.enterprisemiddleware.guestbooking.GuestBookingRestService;
-import uk.ac.newcastle.enterprisemiddleware.customer.*;
-import uk.ac.newcastle.enterprisemiddleware.booking.*;
-
-import java.util.Calendar;
 import java.util.Date;
 
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import io.quarkus.test.common.QuarkusTestResource;
+import io.quarkus.test.h2.H2DatabaseTestResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
 import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import uk.ac.newcastle.enterprisemiddleware.booking.Booking;
+import uk.ac.newcastle.enterprisemiddleware.customer.Customer;
+import uk.ac.newcastle.enterprisemiddleware.flight.Flight;
+import uk.ac.newcastle.enterprisemiddleware.guestbooking.GuestBooking;
 
 @QuarkusTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -36,6 +32,7 @@ public class GuestBookingServiceIntegrationTest {
 
     @BeforeAll
     static void setup() {
+
         guestBooking = new GuestBooking();
 
         flight = new Flight();
@@ -59,6 +56,11 @@ public class GuestBookingServiceIntegrationTest {
 
 
 
+    }
+
+    @BeforeEach
+    void configureApiKey() {
+        RestAssured.filters(new org.acme.infrastructure.security.ApiKeyRequestFilter());
     }
 
     @Test
