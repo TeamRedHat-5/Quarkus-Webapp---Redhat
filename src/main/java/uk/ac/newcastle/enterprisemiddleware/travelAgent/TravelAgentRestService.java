@@ -29,6 +29,7 @@ import javax.transaction.Transactional;
 import javax.transaction.UserTransaction;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -88,6 +89,7 @@ public class TravelAgentRestService {
     public Response createTravelAgent(
             @Parameter(description =
                     "JSON representation of TravelAgent object to be added to the database", required = true)
+            @Valid
             TravelAgent travelAgent) throws Exception {
 
         if (travelAgent == null) {

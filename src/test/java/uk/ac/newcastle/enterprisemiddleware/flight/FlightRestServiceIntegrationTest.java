@@ -1,16 +1,23 @@
 package uk.ac.newcastle.enterprisemiddleware.flight;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.common.http.TestHTTPEndpoint;
 import io.quarkus.test.h2.H2DatabaseTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import static io.restassured.RestAssured.given;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.*;
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import io.restassured.specification.RequestSpecification;
 
 @QuarkusTest
 @TestHTTPEndpoint(FlightRestService.class)
@@ -21,12 +28,26 @@ public class FlightRestServiceIntegrationTest {
 
     @BeforeAll
     static void setup() {
+
         flight = new Flight();
         flight.setFlightNumber("M2345");
         flight.setDeparture("MUM");
         flight.setDestination("NCL");
         System.out.println(flight.toString());
 
+    }
+
+    @BeforeEach
+    void configureApiKey() {
+        RestAssured.requestSpecification = new RequestSpecBuilder()
+            .setBaseUri(RestAssured.baseURI)
+            .setPort(RestAssured.port)
+            .addHeader("X-API-KEY", "change-me")
+            .build();
+    }
+
+    private static RequestSpecification when() {
+        return given().header("X-API-KEY", "change-me");
     }
     @Test
     @Order(1)
