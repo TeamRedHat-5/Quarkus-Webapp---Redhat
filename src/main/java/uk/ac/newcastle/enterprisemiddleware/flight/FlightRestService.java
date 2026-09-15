@@ -1,5 +1,7 @@
 package uk.ac.newcastle.enterprisemiddleware.flight;
 
+import org.acme.infrastructure.api.pagination.PagedResult;
+import org.acme.infrastructure.api.pagination.PaginationUtil;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -7,6 +9,9 @@ import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 import uk.ac.newcastle.enterprisemiddleware.area.InvalidAreaCodeException;
 import uk.ac.newcastle.enterprisemiddleware.util.RestServiceException;
+
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
+import io.quarkus.panache.common.Page;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -32,6 +37,34 @@ public class FlightRestService {
 
     @Inject
     FlightService service;
+
+    @Inject
+    FlightPanacheRepository panacheRepository;
+
+    @GET
+    @Path("/findAllFlightsPaged")
+    @Operation(
+            summary = "Fetch flights, paginated",
+            description = "Returns a page of flights plus pagination metadata (pageIndex, pageSize, " +
+                    "totalElements, totalPages), instead of the full unpaginated table.")
+    @APIResponses(value = {
+            @APIResponse(responseCode = "200", description = "Page of flights returned")
+    })
+    public Response findAllFlightsPaged(
+            @Parameter(description = "Zero-based page index (default 0)")
+            @QueryParam("pageIndex")
+            Integer pageIndex,
+            @Parameter(description = "Number of flights per page (default 20, max 100)")
+            @QueryParam("pageSize")
+            Integer pageSize) {
+
+        Page page = PaginationUtil.resolve(pageIndex, pageSize);
+        PanacheQuery<Flight> query = panacheRepository.findAll();
+
+        PagedResult<Flight> result = PagedResult.from(query, page);
+
+        return Response.ok(result).build();
+    }
 
     @GET
     @Path("/findAllFlights")
