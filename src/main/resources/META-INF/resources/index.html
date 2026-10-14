@@ -143,6 +143,84 @@
                 font-weight: 400;
                 margin-bottom: 15px;
             }
+            .demo-wrapper {
+                padding: 2rem max(1rem, calc((100% - 70rem) / 2));
+                color: #202124;
+                background: #f4f6f8;
+            }
+            .demo-wrapper h1, .demo-wrapper h2, .demo-wrapper h3 { font-weight: 600; }
+            .demo-intro { margin-bottom: 1.5rem; color: #4b5563; }
+            .demo-key, .demo-card {
+                margin: 1rem 0;
+                padding: 1.25rem;
+                border: 1px solid #d9dee5;
+                border-radius: .5rem;
+                background: #fff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, .04);
+            }
+            .demo-key { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+            .demo-key input { width: min(24rem, 100%); }
+            .demo-section { scroll-margin-top: 1rem; }
+            .demo-nav { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
+            .demo-nav a, .demo-button {
+                display: inline-block;
+                padding: .65rem 1rem;
+                border: 0;
+                border-radius: .3rem;
+                background: #1259a5;
+                color: #fff;
+                font: inherit;
+                text-decoration: none;
+                cursor: pointer;
+            }
+            .demo-nav a:hover, .demo-button:hover { background: #0c417a; color: #fff; }
+            .demo-button:disabled { cursor: wait; opacity: .65; }
+            .demo-form {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+                gap: 1rem;
+                margin: 1rem 0;
+            }
+            .demo-field { display: flex; flex-direction: column; gap: .3rem; }
+            .demo-field label { font-weight: 600; }
+            .demo-field input { width: 100%; box-sizing: border-box; }
+            .demo-field input, .demo-key input {
+                min-height: 2.5rem;
+                padding: .45rem .6rem;
+                border: 1px solid #9aa3ad;
+                border-radius: .25rem;
+                font: inherit;
+            }
+            .field-error { min-height: 1.2rem; color: #a12622; font-size: .9rem; }
+            .demo-status { min-height: 1.5rem; margin: .75rem 0; font-weight: 600; }
+            .demo-status[data-state="error"] { color: #a12622; }
+            .demo-status[data-state="success"] { color: #167345; }
+            .demo-result { margin-top: 1rem; }
+            .demo-result pre {
+                max-height: 22rem;
+                overflow: auto;
+                padding: 1rem;
+                border-radius: .3rem;
+                background: #17212b;
+                color: #edf2f7;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+            }
+            .security-table { width: 100%; border-collapse: collapse; }
+            .security-table th, .security-table td {
+                padding: .65rem;
+                border-bottom: 1px solid #d9dee5;
+                text-align: left;
+                overflow-wrap: anywhere;
+            }
+            .security-table th { background: #f4f6f8; }
+            .security-present { color: #167345; font-weight: 600; }
+            .security-missing { color: #a12622; font-weight: 600; }
+            @media screen and (max-width: 600px) {
+                .demo-wrapper { padding: 1rem; }
+                .demo-card { padding: 1rem; }
+                .security-table th, .security-table td { padding: .45rem .25rem; font-size: .9rem; }
+            }
             @media screen and (max-width: 1023px) {
                 .header-wrapper {
                     padding: 0 1rem;
@@ -285,5 +363,285 @@
                 </div>
             </div>
         </div>
+        <main class="demo-wrapper">
+            <h1>Backend behavior demos</h1>
+            <p class="demo-intro">Exercise the running API and inspect its structured responses. Requests are sent to this application, and validation is performed by the server.</p>
+            <div class="demo-key">
+                <label for="api-key"><strong>API key</strong></label>
+                <input id="api-key" type="password" autocomplete="off" placeholder="Enter the configured API key">
+                <span>Required by the API's X-API-KEY authentication filter.</span>
+            </div>
+            <nav class="demo-nav" aria-label="Demo sections">
+                <a href="#error-handling">Error Handling</a>
+                <a href="#input-validation">Input Validation</a>
+                <a href="#security-headers">Security Headers</a>
+            </nav>
+
+            <section id="error-handling" class="demo-card demo-section">
+                <h2>Error Handling</h2>
+                <p>Trigger an unexpected server error or request a contact that does not exist. The response is shown as structured JSON without exposing an internal stack trace.</p>
+                <button class="demo-button" id="trigger-500" type="button">Trigger unexpected HTTP 500</button>
+                <button class="demo-button" id="trigger-404" type="button">Trigger HTTP 404</button>
+                <p id="error-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="error-result" class="demo-result"></div>
+            </section>
+
+            <section id="input-validation" class="demo-card demo-section">
+                <h2>Input Validation</h2>
+                <p>Submit a contact. Try blank names, a malformed email, a name longer than 25 characters, or an invalid phone number to exercise backend validation.</p>
+                <form id="contact-form" novalidate>
+                    <div class="demo-form">
+                        <div class="demo-field">
+                            <label for="firstName">First name</label>
+                            <input id="firstName" name="firstName" type="text" autocomplete="given-name">
+                            <span class="field-error" data-error-for="firstName"></span>
+                        </div>
+                        <div class="demo-field">
+                            <label for="lastName">Last name</label>
+                            <input id="lastName" name="lastName" type="text" autocomplete="family-name">
+                            <span class="field-error" data-error-for="lastName"></span>
+                        </div>
+                        <div class="demo-field">
+                            <label for="email">Email</label>
+                            <input id="email" name="email" type="text" autocomplete="email">
+                            <span class="field-error" data-error-for="email"></span>
+                        </div>
+                        <div class="demo-field">
+                            <label for="phoneNumber">Phone number</label>
+                            <input id="phoneNumber" name="phoneNumber" type="text" placeholder="(201) 123-4567" autocomplete="tel">
+                            <span class="field-error" data-error-for="phoneNumber"></span>
+                        </div>
+                        <div class="demo-field">
+                            <label for="birthDate">Birth date</label>
+                            <input id="birthDate" name="birthDate" type="date">
+                            <span class="field-error" data-error-for="birthDate"></span>
+                        </div>
+                        <div class="demo-field">
+                            <label for="state">State (optional)</label>
+                            <input id="state" name="state" type="text" autocomplete="address-level1">
+                            <span class="field-error" data-error-for="state"></span>
+                        </div>
+                    </div>
+                    <button class="demo-button" id="submit-contact" type="submit">Submit contact</button>
+                </form>
+                <p id="validation-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="validation-result" class="demo-result"></div>
+            </section>
+
+            <section id="security-headers" class="demo-card demo-section">
+                <h2>Security Headers</h2>
+                <p>Send a fresh request to <code>GET /contacts</code> and compare its response headers with the values configured by the backend.</p>
+                <button class="demo-button" id="inspect-headers" type="button">Refresh header inspection</button>
+                <p id="headers-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="headers-result" class="demo-result">
+                    <p>Response headers have not been inspected yet.</p>
+                </div>
+                <p>If a header is unavailable to JavaScript, check the request's Response Headers in browser developer tools. The table also reports which values could not be read.</p>
+            </section>
+        </main>
+        <script>
+            (function () {
+                "use strict";
+
+                var apiKeyInput = document.getElementById("api-key");
+                var errorStatus = document.getElementById("error-status");
+                var validationStatus = document.getElementById("validation-status");
+                var headersStatus = document.getElementById("headers-status");
+
+                function setStatus(element, message, state) {
+                    element.textContent = message;
+                    element.dataset.state = state || "";
+                }
+
+                function requestHeaders(json) {
+                    var headers = { "X-API-KEY": apiKeyInput.value.trim() };
+                    if (json) {
+                        headers["Content-Type"] = "application/json";
+                    }
+                    return headers;
+                }
+
+                async function readResponse(response) {
+                    var text = await response.text();
+                    if (!text) {
+                        return null;
+                    }
+                    try {
+                        return JSON.parse(text);
+                    } catch (error) {
+                        return null;
+                    }
+                }
+
+                function showJson(container, data) {
+                    var pre = document.createElement("pre");
+                    pre.textContent = JSON.stringify(data, null, 2);
+                    container.replaceChildren(pre);
+                }
+
+                async function runErrorDemo(path) {
+                    var button500 = document.getElementById("trigger-500");
+                    var button404 = document.getElementById("trigger-404");
+                    var result = document.getElementById("error-result");
+                    button500.disabled = true;
+                    button404.disabled = true;
+                    result.replaceChildren();
+                    setStatus(errorStatus, "Request in progress...", "");
+                    try {
+                        var response = await fetch(path, { headers: requestHeaders(false) });
+                        var data = await readResponse(response);
+                        setStatus(errorStatus, "HTTP " + response.status + (data && data.error ? " — " + data.error : ""), response.ok ? "success" : "error");
+                        if (data && typeof data === "object") {
+                            var summary = document.createElement("p");
+                            var details = [];
+                            if (data.timestamp) details.push("Timestamp: " + data.timestamp);
+                            if (data.status) details.push("Status: " + data.status);
+                            if (data.error) details.push("Error: " + data.error);
+                            if (data.message) details.push("Message: " + data.message);
+                            if (data.path) details.push("Path: " + data.path);
+                            summary.textContent = details.join(" | ");
+                            result.appendChild(summary);
+                            showJson(result, data);
+                        } else {
+                            result.textContent = "The server response was not JSON. Check the endpoint and API key, then retry.";
+                        }
+                    } catch (error) {
+                        setStatus(errorStatus, "The request could not reach the application. Check that Quarkus is running and retry.", "error");
+                    } finally {
+                        button500.disabled = false;
+                        button404.disabled = false;
+                    }
+                }
+
+                document.getElementById("trigger-500").addEventListener("click", function () {
+                    runErrorDemo("/demo/errors/unexpected");
+                });
+                document.getElementById("trigger-404").addEventListener("click", function () {
+                    runErrorDemo("/contacts/999999999");
+                });
+
+                var contactForm = document.getElementById("contact-form");
+                contactForm.addEventListener("submit", async function (event) {
+                    event.preventDefault();
+                    var submitButton = document.getElementById("submit-contact");
+                    var result = document.getElementById("validation-result");
+                    var fieldErrors = contactForm.querySelectorAll(".field-error");
+                    fieldErrors.forEach(function (element) { element.textContent = ""; });
+                    result.replaceChildren();
+                    submitButton.disabled = true;
+                    setStatus(validationStatus, "Submitting contact...", "");
+
+                    var formData = new FormData(contactForm);
+                    var birthDate = formData.get("birthDate");
+                    var payload = {
+                        firstName: formData.get("firstName"),
+                        lastName: formData.get("lastName"),
+                        email: formData.get("email"),
+                        phoneNumber: formData.get("phoneNumber"),
+                        birthDate: birthDate ? new Date(birthDate + "T00:00:00Z").toISOString() : null,
+                        state: formData.get("state") || null
+                    };
+
+                    try {
+                        var response = await fetch("/contacts", {
+                            method: "POST",
+                            headers: requestHeaders(true),
+                            body: JSON.stringify(payload)
+                        });
+                        var data = await readResponse(response);
+                        var reasons = {};
+                        if (data && data.reasons && typeof data.reasons === "object") {
+                            Object.keys(data.reasons).forEach(function (path) {
+                                reasons[path] = data.reasons[path];
+                            });
+                        }
+                        function addReason(path, message) {
+                            reasons[path] = reasons[path] ? reasons[path] + "; " + message : message;
+                        }
+                        if (data && Array.isArray(data.violations)) {
+                            data.violations.forEach(function (violation) {
+                                var path = violation.field || violation.propertyPath;
+                                if (path) addReason(path, violation.message);
+                            });
+                        }
+                        Object.keys(reasons).forEach(function (path) {
+                            var field = path.split(".").pop();
+                            var target = contactForm.querySelector('[data-error-for="' + field + '"]');
+                            if (target) target.textContent = reasons[path];
+                        });
+                        if (response.ok) {
+                            setStatus(validationStatus, "Contact created successfully (HTTP " + response.status + ").", "success");
+                        } else {
+                            var message = data && (data.message || data.title || data.error) ? (data.message || data.title || data.error) : "The request failed. Check the API key and response below.";
+                            setStatus(validationStatus, "HTTP " + response.status + " — " + message, "error");
+                        }
+                        if (data && typeof data === "object") {
+                            showJson(result, data);
+                        } else {
+                            result.textContent = "The server response was not JSON. Check the endpoint and API key, then retry.";
+                        }
+                    } catch (error) {
+                        setStatus(validationStatus, "The request could not reach the application. Check that Quarkus is running and retry.", "error");
+                    } finally {
+                        submitButton.disabled = false;
+                    }
+                });
+
+                var expectedHeaders = [
+                    ["X-Content-Type-Options", "nosniff"],
+                    ["X-Frame-Options", "DENY"],
+                    ["X-XSS-Protection", "1; mode=block"],
+                    ["Strict-Transport-Security", "max-age=31536000; includeSubDomains"]
+                ];
+
+                document.getElementById("inspect-headers").addEventListener("click", async function () {
+                    var button = this;
+                    var result = document.getElementById("headers-result");
+                    button.disabled = true;
+                    result.replaceChildren();
+                    setStatus(headersStatus, "Inspecting response headers...", "");
+                    try {
+                        var response = await fetch("/contacts", { headers: requestHeaders(false), cache: "no-store" });
+                        var table = document.createElement("table");
+                        table.className = "security-table";
+                        var thead = document.createElement("thead");
+                        thead.innerHTML = "<tr><th>Header</th><th>Expected</th><th>Received</th><th>Result</th></tr>";
+                        table.appendChild(thead);
+                        var tbody = document.createElement("tbody");
+                        var allMatch = true;
+                        expectedHeaders.forEach(function (entry) {
+                            var received = response.headers.get(entry[0]);
+                            var matches = received === entry[1];
+                            if (!matches) allMatch = false;
+                            var row = document.createElement("tr");
+                            [entry[0], entry[1], received || "Not readable / not present"].forEach(function (value) {
+                                var cell = document.createElement("td");
+                                cell.textContent = value;
+                                row.appendChild(cell);
+                            });
+                            var resultCell = document.createElement("td");
+                            resultCell.textContent = matches ? "Present and matches" : "Missing or does not match";
+                            resultCell.className = matches ? "security-present" : "security-missing";
+                            row.appendChild(resultCell);
+                            tbody.appendChild(row);
+                        });
+                        table.appendChild(tbody);
+                        result.appendChild(table);
+                        var responseInfo = document.createElement("p");
+                        responseInfo.textContent = "Inspection request returned HTTP " + response.status + ".";
+                        result.appendChild(responseInfo);
+                        if (allMatch) {
+                            setStatus(headersStatus, "All expected security headers are present with configured values.", "success");
+                        } else {
+                            setStatus(headersStatus, "One or more headers are missing or differ from the configured values. If unreadable, verify in browser developer tools.", "error");
+                        }
+                    } catch (error) {
+                        setStatus(headersStatus, "The request could not reach the application. Check that Quarkus is running and retry.", "error");
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+            }());
+        </script>
     </body>
 </html>
