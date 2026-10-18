@@ -33,7 +33,11 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
         String message = "An unexpected error occurred while processing the request.";
         Map<String, String> reasons = new HashMap<>();
 
-        if (exception instanceof ConstraintViolationException) {
+        if (hasOptimisticLockCause(exception)) {
+            status = Response.Status.CONFLICT.getStatusCode();
+            error = Response.Status.CONFLICT.getReasonPhrase();
+            message = "The resource was modified by another request. Please reload and try again.";
+        } else if (exception instanceof ConstraintViolationException) {
             ConstraintViolationException cve = (ConstraintViolationException) exception;
             status = Response.Status.BAD_REQUEST.getStatusCode();
             error = Response.Status.BAD_REQUEST.getReasonPhrase();
@@ -59,10 +63,6 @@ public class GlobalExceptionMapper implements ExceptionMapper<Throwable> {
                 error = "Request Error";
                 message = "The request could not be processed.";
             }
-        } else if (hasOptimisticLockCause(exception)) {
-            status = Response.Status.CONFLICT.getStatusCode();
-            error = Response.Status.CONFLICT.getReasonPhrase();
-            message = "The resource was modified by another request. Please reload and try again.";
         }
 
         ErrorResponseDTO responseBody = new ErrorResponseDTO(
