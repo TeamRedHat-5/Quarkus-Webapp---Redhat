@@ -216,7 +216,6 @@
             .security-table th { background: #f4f6f8; }
             .security-present { color: #167345; font-weight: 600; }
             .security-missing { color: #a12622; font-weight: 600; }
-<<<<<<< HEAD
             .health-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
@@ -244,16 +243,28 @@
             .demo-checkbox { display: flex; align-items: flex-start; gap: .5rem; margin: .75rem 0; }
             .demo-checkbox input { margin-top: .25rem; }
             .demo-button[hidden] { display: none; }
-=======
->>>>>>> origin/main
+            .snapshot-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+                gap: 1rem;
+                margin: 1rem 0;
+            }
+            .snapshot-card { min-width: 0; padding: 1rem; border: 1px solid #d9dee5; border-radius: .35rem; }
+            .snapshot-card label { display: flex; flex-direction: column; gap: .3rem; font-weight: 600; }
+            .snapshot-card input, .pagination-controls select { min-height: 2.5rem; padding: .45rem .6rem; border: 1px solid #9aa3ad; border-radius: .25rem; font: inherit; }
+            .snapshot-version { min-height: 1.5rem; color: #4b5563; }
+            .pagination-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin: 1rem 0; }
+            .pagination-controls label { display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+            .pagination-table { width: 100%; border-collapse: collapse; }
+            .pagination-table th, .pagination-table td { padding: .65rem; border-bottom: 1px solid #d9dee5; text-align: left; overflow-wrap: anywhere; }
+            .pagination-table th { background: #f4f6f8; }
+            .auth-disclaimer { padding: .75rem; border-left: 4px solid #d28b00; background: #fff8e1; }
             @media screen and (max-width: 600px) {
                 .demo-wrapper { padding: 1rem; }
                 .demo-card { padding: 1rem; }
                 .security-table th, .security-table td { padding: .45rem .25rem; font-size: .9rem; }
-<<<<<<< HEAD
                 .audit-table th, .audit-table td { padding: .45rem .25rem; font-size: .9rem; }
-=======
->>>>>>> origin/main
+                .pagination-table th, .pagination-table td { padding: .45rem .25rem; font-size: .9rem; }
             }
             @media screen and (max-width: 1023px) {
                 .header-wrapper {
@@ -406,18 +417,17 @@
                 <span>Required by the API's X-API-KEY authentication filter.</span>
             </div>
             <nav class="demo-nav" aria-label="Demo sections">
-<<<<<<< HEAD
                 <a href="#system-health">System Health</a>
                 <a href="#json-inspector">JSON Inspector</a>
                 <a href="#audit-information">Audit Information</a>
-=======
->>>>>>> origin/main
+                <a href="#record-updates">Record Updates</a>
+                <a href="#api-authentication">API Authentication</a>
+                <a href="#paginated-records">Paginated Records</a>
                 <a href="#error-handling">Error Handling</a>
                 <a href="#input-validation">Input Validation</a>
                 <a href="#security-headers">Security Headers</a>
             </nav>
 
-<<<<<<< HEAD
             <section id="system-health" class="demo-card demo-section">
                 <h2>System Health</h2>
                 <p>Read the live SmallRye liveness and readiness probes. A confirmed DOWN response is distinguished from an unavailable endpoint or an unexpected response.</p>
@@ -446,8 +456,6 @@
                 <p>To exercise null omission, create a contact below with the optional State field blank, then refresh this response and check that no <code>state: null</code> property is returned. Use the unknown-property checkbox on the contact form to send an extra request property and verify that the backend accepts it without returning it as a Contact field.</p>
             </section>
 
-=======
->>>>>>> origin/main
             <section id="error-handling" class="demo-card demo-section">
                 <h2>Error Handling</h2>
                 <p>Trigger an unexpected server error or request a contact that does not exist. The response is shown as structured JSON without exposing an internal stack trace.</p>
@@ -493,22 +501,17 @@
                             <span class="field-error" data-error-for="state"></span>
                         </div>
                     </div>
-<<<<<<< HEAD
                     <label class="demo-checkbox" for="include-unknown-property">
                         <input id="include-unknown-property" type="checkbox">
                         <span>Include an unknown JSON property to demonstrate backend deserialization behavior.</span>
                     </label>
                     <button class="demo-button" id="submit-contact" type="submit">Submit contact</button>
                     <button class="demo-button" id="cancel-contact-update" type="button" hidden>Cancel update</button>
-=======
-                    <button class="demo-button" id="submit-contact" type="submit">Submit contact</button>
->>>>>>> origin/main
                 </form>
                 <p id="validation-status" class="demo-status" role="status" aria-live="polite"></p>
                 <div id="validation-result" class="demo-result"></div>
             </section>
 
-<<<<<<< HEAD
             <section id="audit-information" class="demo-card demo-section">
                 <h2>Audit Information</h2>
                 <p>Load real contacts and inspect the creation and modification timestamps returned by the API. The edit action uses the existing contact update endpoint.</p>
@@ -527,8 +530,74 @@
                 <p>Timestamp values and their original ISO-8601 strings are taken from the backend response. After an update, the page reloads the saved contact to show the persisted modification time.</p>
             </section>
 
-=======
->>>>>>> origin/main
+            <section id="record-updates" class="demo-card demo-section">
+                <h2>Record Updates</h2>
+                <p>Load the selected contact twice to create two independent server-fetched snapshots. Save one view, then save the other with its older backend version to demonstrate optimistic locking.</p>
+                <div class="audit-controls">
+                    <label for="concurrency-contact-select">Contact
+                        <select id="concurrency-contact-select" aria-describedby="record-update-status">
+                            <option value="">Load contacts in Audit Information first</option>
+                        </select>
+                    </label>
+                    <button class="demo-button" id="load-record-copies" type="button">Load two independent views</button>
+                </div>
+                <div class="snapshot-grid">
+                    <div class="snapshot-card">
+                        <h3>View A</h3>
+                        <p id="snapshot-a-version" class="snapshot-version">No record loaded.</p>
+                        <label for="snapshot-a-first-name">First name
+                            <input id="snapshot-a-first-name" type="text" autocomplete="off" disabled>
+                        </label>
+                        <button class="demo-button" id="save-snapshot-a" type="button" disabled>Save View A</button>
+                    </div>
+                    <div class="snapshot-card">
+                        <h3>View B</h3>
+                        <p id="snapshot-b-version" class="snapshot-version">No record loaded.</p>
+                        <label for="snapshot-b-first-name">First name
+                            <input id="snapshot-b-first-name" type="text" autocomplete="off" disabled>
+                        </label>
+                        <button class="demo-button" id="save-snapshot-b" type="button" disabled>Save View B</button>
+                    </div>
+                </div>
+                <p id="record-update-status" class="demo-status" role="status" aria-live="polite"></p>
+                <button class="demo-button" id="reload-latest-record" type="button" disabled>Reload latest record (does not replace either view)</button>
+                <div id="record-update-result" class="demo-result"><p>Load a contact into both views to begin.</p></div>
+                <p>A stale update is rejected by the backend. After a conflict, the latest record is not copied into either editor automatically; use the explicit reload action or load both views again.</p>
+            </section>
+
+            <section id="api-authentication" class="demo-card demo-section">
+                <h2>API Authentication</h2>
+                <p>Probe the protected <code>GET /contacts</code> endpoint with no key, a deliberately invalid key, or the configured key from the password field above. Responses show the actual HTTP status and structured body.</p>
+                <p class="auth-disclaimer">This UI runs in the browser. An API key entered here is visible to the browser and is not suitable for protecting production secrets. Use only a development key; the page does not persist or display the key value.</p>
+                <button class="demo-button auth-probe" data-key-mode="missing" type="button">Request without API key</button>
+                <button class="demo-button auth-probe" data-key-mode="invalid" type="button">Request with invalid API key</button>
+                <button class="demo-button auth-probe" data-key-mode="configured" type="button">Request with configured API key</button>
+                <p id="authentication-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="authentication-result" class="demo-result"><p>No authentication probe has been run yet.</p></div>
+            </section>
+
+            <section id="paginated-records" class="demo-card demo-section">
+                <h2>Paginated Records</h2>
+                <p>Browse the backend's paginated flights response from <code>GET /flight/findAllFlightsPaged</code>. The table and metadata are populated from each server response.</p>
+                <div class="pagination-controls">
+                    <button class="demo-button" id="load-flight-page" type="button">Load flights</button>
+                    <button class="demo-button" id="previous-flight-page" type="button" disabled>Previous</button>
+                    <button class="demo-button" id="next-flight-page" type="button" disabled>Next</button>
+                    <label for="flight-page-size">Page size
+                        <select id="flight-page-size">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                    </label>
+                </div>
+                <p id="pagination-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="pagination-metadata" class="demo-result"><p>No page has been loaded yet.</p></div>
+                <div id="pagination-result" class="demo-result"></div>
+            </section>
+
             <section id="security-headers" class="demo-card demo-section">
                 <h2>Security Headers</h2>
                 <p>Send a fresh request to <code>GET /contacts</code> and compare its response headers with the values configured by the backend.</p>
@@ -548,7 +617,6 @@
                 var errorStatus = document.getElementById("error-status");
                 var validationStatus = document.getElementById("validation-status");
                 var headersStatus = document.getElementById("headers-status");
-<<<<<<< HEAD
                 var healthButton = document.getElementById("refresh-health");
                 var jsonStatus = document.getElementById("json-status");
                 var auditStatus = document.getElementById("audit-status");
@@ -556,8 +624,9 @@
                 var currentAuditContact = null;
                 var updatingContactId = null;
                 var updatingContactVersion = null;
-=======
->>>>>>> origin/main
+                var snapshotA = null;
+                var snapshotB = null;
+                var currentFlightPage = null;
 
                 function setStatus(element, message, state) {
                     element.textContent = message;
@@ -584,7 +653,6 @@
                     }
                 }
 
-<<<<<<< HEAD
                 async function readJsonResponse(response) {
                     var text = await response.text();
                     if (!text) return null;
@@ -595,15 +663,12 @@
                     }
                 }
 
-=======
->>>>>>> origin/main
                 function showJson(container, data) {
                     var pre = document.createElement("pre");
                     pre.textContent = JSON.stringify(data, null, 2);
                     container.replaceChildren(pre);
                 }
 
-<<<<<<< HEAD
                 function showProbeResult(container, data) {
                     container.replaceChildren();
                     if (data && typeof data === "object") {
@@ -694,27 +759,33 @@
 
                 function addContactOption(contact) {
                     if (!contact || contact.id === undefined || contact.id === null) return;
-                    var existing = Array.prototype.find.call(auditContactSelect.options, function (option) {
-                        return option.value === String(contact.id);
+                    [auditContactSelect, document.getElementById("concurrency-contact-select")].forEach(function (select) {
+                        var existing = Array.prototype.find.call(select.options, function (option) {
+                            return option.value === String(contact.id);
+                        });
+                        if (existing) {
+                            existing.textContent = "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "");
+                        } else {
+                            var option = document.createElement("option");
+                            option.value = contact.id;
+                            option.textContent = "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "");
+                            select.appendChild(option);
+                        }
+                        select.value = String(contact.id);
                     });
-                    if (existing) {
-                        existing.textContent = "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "");
-                    } else {
-                        var option = document.createElement("option");
-                        option.value = contact.id;
-                        option.textContent = "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "");
-                        auditContactSelect.appendChild(option);
-                    }
-                    auditContactSelect.value = String(contact.id);
                 }
 
                 function populateContactOptions(contacts) {
+                    var concurrencySelect = document.getElementById("concurrency-contact-select");
                     auditContactSelect.replaceChildren();
+                    concurrencySelect.replaceChildren();
                     if (!Array.isArray(contacts) || contacts.length === 0) {
-                        var emptyOption = document.createElement("option");
-                        emptyOption.value = "";
-                        emptyOption.textContent = "No contacts returned by the API";
-                        auditContactSelect.appendChild(emptyOption);
+                        [auditContactSelect, concurrencySelect].forEach(function (select) {
+                            var emptyOption = document.createElement("option");
+                            emptyOption.value = "";
+                            emptyOption.textContent = "No contacts returned by the API";
+                            select.appendChild(emptyOption);
+                        });
                         return;
                     }
                     contacts.forEach(addContactOption);
@@ -895,8 +966,314 @@
                     setStatus(validationStatus, "Update cancelled.", "");
                 });
 
-=======
->>>>>>> origin/main
+                async function fetchContactSnapshot(id) {
+                    var response = await fetch("/contacts/" + encodeURIComponent(id), {
+                        headers: requestHeaders(false),
+                        cache: "no-store"
+                    });
+                    var data = await readJsonResponse(response);
+                    if (!response.ok) {
+                        var error = new Error(data && data.message ? data.message : "HTTP " + response.status);
+                        error.status = response.status;
+                        error.data = data;
+                        throw error;
+                    }
+                    if (!data || typeof data !== "object" || String(data.id) !== String(id)) {
+                        throw new Error("The API returned an unexpected contact record.");
+                    }
+                    return data;
+                }
+
+                function showSnapshot(copy, contact) {
+                    var name = copy === "a" ? "View A" : "View B";
+                    var versionElement = document.getElementById("snapshot-" + copy + "-version");
+                    var input = document.getElementById("snapshot-" + copy + "-first-name");
+                    var saveButton = document.getElementById("save-snapshot-" + copy);
+                    if (!contact) {
+                        versionElement.textContent = "No record loaded.";
+                        input.value = "";
+                        input.disabled = true;
+                        saveButton.disabled = true;
+                        return;
+                    }
+                    versionElement.textContent = name + " — contact #" + contact.id + ", backend version " + contact.version;
+                    input.value = contact.firstName || "";
+                    input.disabled = false;
+                    saveButton.disabled = false;
+                }
+
+                document.getElementById("load-record-copies").addEventListener("click", async function () {
+                    var button = this;
+                    var id = document.getElementById("concurrency-contact-select").value;
+                    var result = document.getElementById("record-update-result");
+                    if (!id) {
+                        setStatus(document.getElementById("record-update-status"), "Load contacts in Audit Information and select a record first.", "error");
+                        return;
+                    }
+                    button.disabled = true;
+                    setStatus(document.getElementById("record-update-status"), "Fetching two independent copies of contact #" + id + "...", "");
+                    try {
+                        var copies = await Promise.all([fetchContactSnapshot(id), fetchContactSnapshot(id)]);
+                        snapshotA = copies[0];
+                        snapshotB = copies[1];
+                        showSnapshot("a", snapshotA);
+                        showSnapshot("b", snapshotB);
+                        result.replaceChildren();
+                        var note = document.createElement("p");
+                        note.textContent = "Two independent GET requests returned backend version " + snapshotA.version +
+                            " for contact #" + id + ". Saving one view will make the other view stale.";
+                        result.appendChild(note);
+                        setStatus(document.getElementById("record-update-status"), "Both views loaded from the backend.", "success");
+                        document.getElementById("reload-latest-record").disabled = false;
+                    } catch (error) {
+                        snapshotA = null;
+                        snapshotB = null;
+                        showSnapshot("a", null);
+                        showSnapshot("b", null);
+                        setStatus(document.getElementById("record-update-status"), "Could not load both views: " + error.message, "error");
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+
+                async function saveSnapshot(copy) {
+                    var snapshot = copy === "a" ? snapshotA : snapshotB;
+                    var button = document.getElementById("save-snapshot-" + copy);
+                    var status = document.getElementById("record-update-status");
+                    var result = document.getElementById("record-update-result");
+                    if (!snapshot) {
+                        setStatus(status, "Load both views before saving.", "error");
+                        return;
+                    }
+                    var payload = Object.assign({}, snapshot, {
+                        firstName: document.getElementById("snapshot-" + copy + "-first-name").value
+                    });
+                    button.disabled = true;
+                    setStatus(status, "Saving View " + copy.toUpperCase() + " with backend version " + snapshot.version + "...", "");
+                    try {
+                        var response = await fetch("/contacts/" + encodeURIComponent(snapshot.id), {
+                            method: "PUT",
+                            headers: requestHeaders(true),
+                            body: JSON.stringify(payload)
+                        });
+                        var data = await readJsonResponse(response);
+                        result.replaceChildren();
+                        showJson(result, data);
+                        if (response.status === 409) {
+                            var isStaleWrite = data && typeof data.message === "string" &&
+                                data.message.toLowerCase().indexOf("modified by another request") !== -1;
+                            setStatus(status, isStaleWrite
+                                ? "HTTP 409 Conflict — this view was stale; another request modified the record. Your attempted update was not applied. Reload the latest record or load both views again."
+                                : "HTTP 409 Conflict — the backend rejected the update. Inspect the response; no latest data was copied into either editor.", "error");
+                            return;
+                        }
+                        if (!response.ok) {
+                            setStatus(status, "Update rejected (HTTP " + response.status + "). Inspect the backend response below.", "error");
+                            return;
+                        }
+                        var latest = await fetchContactSnapshot(snapshot.id);
+                        if (copy === "a") snapshotA = latest;
+                        else snapshotB = latest;
+                        showSnapshot(copy, latest);
+                        setStatus(status, "View " + copy.toUpperCase() + " saved (HTTP " + response.status + ") and refreshed at backend version " + latest.version +
+                            ". The other view was not refreshed.", "success");
+                    } catch (error) {
+                        result.replaceChildren();
+                        if (error.data) showJson(result, error.data);
+                        setStatus(status, "Could not save View " + copy.toUpperCase() + ": " + error.message, "error");
+                    } finally {
+                        button.disabled = false;
+                    }
+                }
+
+                document.getElementById("save-snapshot-a").addEventListener("click", function () {
+                    saveSnapshot("a");
+                });
+                document.getElementById("save-snapshot-b").addEventListener("click", function () {
+                    saveSnapshot("b");
+                });
+
+                document.getElementById("reload-latest-record").addEventListener("click", async function () {
+                    var id = document.getElementById("concurrency-contact-select").value ||
+                        (snapshotA && snapshotA.id) || (snapshotB && snapshotB.id);
+                    var button = this;
+                    var status = document.getElementById("record-update-status");
+                    var result = document.getElementById("record-update-result");
+                    if (!id) {
+                        setStatus(status, "Select a contact to reload.", "error");
+                        return;
+                    }
+                    button.disabled = true;
+                    setStatus(status, "Reloading latest contact #" + id + "...", "");
+                    try {
+                        var latest = await fetchContactSnapshot(id);
+                        result.replaceChildren();
+                        var heading = document.createElement("h3");
+                        heading.textContent = "Latest backend state — version " + latest.version;
+                        result.appendChild(heading);
+                        var json = document.createElement("div");
+                        result.appendChild(json);
+                        showJson(json, latest);
+                        setStatus(status, "Latest state loaded. Neither view was overwritten; load both views again to start a fresh comparison.", "success");
+                    } catch (error) {
+                        result.replaceChildren();
+                        if (error.data) showJson(result, error.data);
+                        setStatus(status, "Could not reload the latest record: " + error.message, "error");
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+
+                document.querySelectorAll(".auth-probe").forEach(function (button) {
+                    button.addEventListener("click", async function () {
+                        var mode = button.dataset.keyMode;
+                        var status = document.getElementById("authentication-status");
+                        var result = document.getElementById("authentication-result");
+                        var buttons = document.querySelectorAll(".auth-probe");
+                        buttons.forEach(function (item) { item.disabled = true; });
+                        result.replaceChildren();
+                        setStatus(status, "Requesting protected GET /contacts...", "");
+                        try {
+                            var headers = {};
+                            if (mode === "invalid") {
+                                headers["X-API-KEY"] = "invalid-demo-key";
+                            } else if (mode === "configured") {
+                                var key = apiKeyInput.value.trim();
+                                if (!key) {
+                                    setStatus(status, "Enter the configured development API key above first.", "error");
+                                    return;
+                                }
+                                headers["X-API-KEY"] = key;
+                            }
+                            var response = await fetch("/contacts", { headers: headers, cache: "no-store" });
+                            var data = await readJsonResponse(response);
+                            showProbeResult(result, data);
+                            if (response.status === 401) {
+                                setStatus(status, "HTTP 401 Unauthorized — the backend rejected this request. The structured response is shown below.", "error");
+                            } else if (response.ok && mode === "configured") {
+                                setStatus(status, "Authenticated successfully (HTTP " + response.status + "). The protected resource returned real data.", "success");
+                            } else {
+                                setStatus(status, "Unexpected response for this authentication test (HTTP " + response.status + ").", "error");
+                            }
+                        } catch (error) {
+                            setStatus(status, "Authentication request failed: " + error.message, "error");
+                            result.textContent = "No valid response could be read.";
+                        } finally {
+                            buttons.forEach(function (item) { item.disabled = false; });
+                        }
+                    });
+                });
+
+                var flightPageSize = document.getElementById("flight-page-size");
+                var previousFlightPageButton = document.getElementById("previous-flight-page");
+                var nextFlightPageButton = document.getElementById("next-flight-page");
+                var loadFlightPageButton = document.getElementById("load-flight-page");
+
+                async function loadFlightPage(pageIndex) {
+                    var status = document.getElementById("pagination-status");
+                    var metadata = document.getElementById("pagination-metadata");
+                    var result = document.getElementById("pagination-result");
+                    [loadFlightPageButton, previousFlightPageButton, nextFlightPageButton].forEach(function (button) {
+                        button.disabled = true;
+                    });
+                    setStatus(status, "Loading page " + pageIndex + "...", "");
+                    result.replaceChildren();
+                    try {
+                        var query = new URLSearchParams({
+                            pageIndex: String(pageIndex),
+                            pageSize: flightPageSize.value
+                        });
+                        var response = await fetch("/flight/findAllFlightsPaged?" + query.toString(), {
+                            headers: requestHeaders(false),
+                            cache: "no-store"
+                        });
+                        var data = await readJsonResponse(response);
+                        if (!response.ok) {
+                            currentFlightPage = null;
+                            metadata.replaceChildren();
+                            showProbeResult(result, data);
+                            setStatus(status, "Could not load flights (HTTP " + response.status + ").", "error");
+                            return;
+                        }
+                        if (!data || !Array.isArray(data.data) ||
+                            !Number.isInteger(data.pageIndex) || !Number.isInteger(data.pageSize) ||
+                            !Number.isInteger(data.totalPages) || typeof data.totalElements !== "number") {
+                            throw new Error("The backend returned an unexpected paginated response.");
+                        }
+                        currentFlightPage = data;
+                        metadata.textContent = "pageIndex: " + data.pageIndex +
+                            " · pageSize: " + data.pageSize + " · totalElements: " + data.totalElements +
+                            " · totalPages: " + data.totalPages;
+                        renderFlightRows(data.data);
+                        previousFlightPageButton.disabled = data.pageIndex <= 0;
+                        nextFlightPageButton.disabled = data.pageIndex + 1 >= data.totalPages;
+                        setStatus(status, data.data.length
+                            ? "Loaded " + data.data.length + " flight(s) from the backend."
+                            : (data.totalElements === 0 ? "No flights are currently available." : "This page contains no records."), data.data.length ? "success" : "");
+                    } catch (error) {
+                        currentFlightPage = null;
+                        metadata.replaceChildren();
+                        result.textContent = "No page data could be displayed.";
+                        setStatus(status, "Could not load paginated flights: " + error.message, "error");
+                    } finally {
+                        loadFlightPageButton.disabled = false;
+                        if (!currentFlightPage) {
+                            previousFlightPageButton.disabled = true;
+                            nextFlightPageButton.disabled = true;
+                        }
+                    }
+                }
+
+                function renderFlightRows(flights) {
+                    var result = document.getElementById("pagination-result");
+                    result.replaceChildren();
+                    if (flights.length === 0) {
+                        result.textContent = "No flight records on this page.";
+                        return;
+                    }
+                    var table = document.createElement("table");
+                    table.className = "pagination-table";
+                    var head = document.createElement("thead");
+                    var headerRow = document.createElement("tr");
+                    ["ID", "Flight number", "Departure", "Destination", "Version"].forEach(function (label) {
+                        var cell = document.createElement("th");
+                        cell.scope = "col";
+                        cell.textContent = label;
+                        headerRow.appendChild(cell);
+                    });
+                    head.appendChild(headerRow);
+                    table.appendChild(head);
+                    var body = document.createElement("tbody");
+                    flights.forEach(function (flight) {
+                        var row = document.createElement("tr");
+                        [flight.id, flight.flightNumber, flight.departure, flight.destination, flight.version].forEach(function (value) {
+                            var cell = document.createElement("td");
+                            cell.textContent = value === undefined || value === null ? "—" : String(value);
+                            row.appendChild(cell);
+                        });
+                        body.appendChild(row);
+                    });
+                    table.appendChild(body);
+                    result.appendChild(table);
+                }
+
+                loadFlightPageButton.addEventListener("click", function () {
+                    loadFlightPage(0);
+                });
+                previousFlightPageButton.addEventListener("click", function () {
+                    if (currentFlightPage && currentFlightPage.pageIndex > 0) {
+                        loadFlightPage(currentFlightPage.pageIndex - 1);
+                    }
+                });
+                nextFlightPageButton.addEventListener("click", function () {
+                    if (currentFlightPage && currentFlightPage.pageIndex + 1 < currentFlightPage.totalPages) {
+                        loadFlightPage(currentFlightPage.pageIndex + 1);
+                    }
+                });
+                flightPageSize.addEventListener("change", function () {
+                    if (currentFlightPage) loadFlightPage(0);
+                });
+
                 async function runErrorDemo(path) {
                     var button500 = document.getElementById("trigger-500");
                     var button404 = document.getElementById("trigger-404");
@@ -959,7 +1336,6 @@
                         birthDate: birthDate ? new Date(birthDate + "T00:00:00Z").toISOString() : null,
                         state: formData.get("state") || null
                     };
-<<<<<<< HEAD
                     var isUpdate = updatingContactId !== null;
                     if (isUpdate) {
                         payload.id = updatingContactId;
@@ -974,12 +1350,6 @@
                     try {
                         var response = await fetch(isUpdate ? "/contacts/" + encodeURIComponent(updatingContactId) : "/contacts", {
                             method: isUpdate ? "PUT" : "POST",
-=======
-
-                    try {
-                        var response = await fetch("/contacts", {
-                            method: "POST",
->>>>>>> origin/main
                             headers: requestHeaders(true),
                             body: JSON.stringify(payload)
                         });
@@ -1005,7 +1375,6 @@
                             if (target) target.textContent = reasons[path];
                         });
                         if (response.ok) {
-<<<<<<< HEAD
                             var operation = isUpdate ? "updated" : "created";
                             var unknownPropertyCheck = document.getElementById("include-unknown-property").checked &&
                                 data && !Object.prototype.hasOwnProperty.call(data, "uiUnknownProperty");
@@ -1019,9 +1388,6 @@
                                 renderAudit(data);
                                 setStatus(auditStatus, "New contact response loaded. Created/updated timestamps shown here came from the backend.", "success");
                             }
-=======
-                            setStatus(validationStatus, "Contact created successfully (HTTP " + response.status + ").", "success");
->>>>>>> origin/main
                         } else {
                             var message = data && (data.message || data.title || data.error) ? (data.message || data.title || data.error) : "The request failed. Check the API key and response below.";
                             setStatus(validationStatus, "HTTP " + response.status + " — " + message, "error");

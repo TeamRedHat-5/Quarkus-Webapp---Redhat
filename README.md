@@ -30,7 +30,6 @@ Run the focused backend coverage for these demos with:
 ```shell
 ./mvnw -Dtest=ErrorDemoRestServiceTest test
 ```
-<<<<<<< HEAD
 
 ## Health, JSON serialization, and entity audit demos
 
@@ -41,5 +40,11 @@ Start the application in dev mode and open [http://localhost:8080/](http://local
 - **Audit Information:** Select **Load contacts**, choose a returned contact, and select **Show audit information**. The creation and modification values are read from `GET /contacts/{id}`; each displays a localized time and the original backend ISO-8601 value. To verify modification auditing, select **Edit this contact**, change a valid field, and submit the form. This sends the existing `PUT /contacts/{id}` request, then reloads the saved contact so its persisted `updatedAt` value can be inspected. `createdAt` should remain unchanged.
 
 All demonstrations use the running application's real endpoints and response bodies; the UI does not generate health results, entity audit timestamps, or JSON examples.
-=======
->>>>>>> origin/main
+
+## Optimistic locking, API authentication, and pagination demos
+
+Use the same local dashboard and enter only a development API key. Browser-entered keys are sent in the `X-API-KEY` request header and are not persisted by the page, but cannot be kept confidential from the browser user; never enter a production secret.
+
+- **Record Updates:** Load contacts in **Audit Information** and select one in **Record Updates**. Choose **Load two independent views**, change the first name in View A, and save it. Change the first name in View B and save it using its older displayed backend version; the backend should reject the stale request with HTTP 409. The conflict response is shown, and neither editor is overwritten. Use **Reload latest record** to inspect server state without changing either view, or load both views again.
+- **API Authentication:** Use **Request without API key**, **Request with invalid API key**, and **Request with configured API key**. The first two should display HTTP 401 and the backend's structured JSON error. The configured-key probe should return the protected contacts resource on success. The entered key is never included in the displayed response.
+- **Paginated Records:** Select **Load flights** to request `/flight/findAllFlightsPaged`. The page displays backend `pageIndex`, `pageSize`, `totalElements`, and `totalPages` metadata with the returned flights. Use Previous/Next or change page size; each action sends a new request. Empty data and request failures are reported separately.
