@@ -1,17 +1,10 @@
 package uk.ac.newcastle.enterprisemiddleware.contact;
 
 
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import uk.ac.newcastle.enterprisemiddleware.area.Area;
-import uk.ac.newcastle.enterprisemiddleware.area.AreaService;
-import uk.ac.newcastle.enterprisemiddleware.area.InvalidAreaCodeException;
-
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.ClientErrorException;
-import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -41,10 +34,6 @@ public class ContactService {
 
     @Inject
     ContactRepository crud;
-
-    //Removed temporarily due to non-existing AreaService
-    @RestClient
-    AreaService areaService;
 
     /**
      * <p>Returns a List of all persisted {@link Contact} objects, sorted alphabetically by last name.<p/>
@@ -114,19 +103,6 @@ public class ContactService {
 
 
 
-        //Create client service instance to make REST requests to upstream service
-        try {
-            //Removed temporarily due to non-existing AreaService
-//             Area area = areaService.getAreaById(Integer.parseInt(contact.getPhoneNumber().substring(1, 4)));
-//             contact.setState(area.getState());
-        } catch (ClientErrorException e) {
-            if (e.getResponse().getStatusInfo() == Response.Status.NOT_FOUND) {
-                throw new InvalidAreaCodeException("The area code provided does not exist", e);
-            } else {
-                throw e;
-            }
-        }
-
         // Write the contact to the database.
         return crud.create(contact);
     }
@@ -145,18 +121,6 @@ public class ContactService {
 
         // Check to make sure the data fits with the parameters in the Contact model and passes validation.
         validator.validateContact(contact);
-
-        try {
-            //Removed temporarily due to non-existing AreaService
-            Area area = areaService.getAreaById(Integer.parseInt(contact.getPhoneNumber().substring(1, 4)));
-            contact.setState(area.getState());
-        } catch (ClientErrorException e) {
-            if (e.getResponse().getStatusInfo() == Response.Status.NOT_FOUND) {
-                throw new InvalidAreaCodeException("The area code provided does not exist", e);
-            } else {
-                throw e;
-            }
-        }
 
         // Either update the contact or add it if it can't be found.
         return crud.update(contact);

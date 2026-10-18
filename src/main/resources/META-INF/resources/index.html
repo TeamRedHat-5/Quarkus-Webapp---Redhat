@@ -216,10 +216,38 @@
             .security-table th { background: #f4f6f8; }
             .security-present { color: #167345; font-weight: 600; }
             .security-missing { color: #a12622; font-weight: 600; }
+            .health-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+                gap: 1rem;
+                margin-top: 1rem;
+            }
+            .health-probe {
+                min-width: 0;
+                padding: 1rem;
+                border: 1px solid #d9dee5;
+                border-radius: .35rem;
+            }
+            .health-indicator { font-weight: 700; }
+            .health-indicator[data-state="success"], .audit-value { color: #167345; }
+            .health-indicator[data-state="error"], .health-indicator[data-state="down"] { color: #a12622; }
+            .health-indicator[data-state="down"]::before { content: "⚠ "; }
+            .health-indicator[data-state="success"]::before { content: "✓ "; }
+            .audit-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; }
+            .audit-controls label { display: flex; flex-direction: column; gap: .3rem; font-weight: 600; }
+            .audit-controls select { min-height: 2.5rem; min-width: min(24rem, 100%); padding: .45rem; font: inherit; }
+            .audit-table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+            .audit-table th, .audit-table td { padding: .65rem; border-bottom: 1px solid #d9dee5; text-align: left; overflow-wrap: anywhere; }
+            .audit-table th { width: 12rem; background: #f4f6f8; }
+            .audit-raw { display: block; margin-top: .25rem; color: #4b5563; }
+            .demo-checkbox { display: flex; align-items: flex-start; gap: .5rem; margin: .75rem 0; }
+            .demo-checkbox input { margin-top: .25rem; }
+            .demo-button[hidden] { display: none; }
             @media screen and (max-width: 600px) {
                 .demo-wrapper { padding: 1rem; }
                 .demo-card { padding: 1rem; }
                 .security-table th, .security-table td { padding: .45rem .25rem; font-size: .9rem; }
+                .audit-table th, .audit-table td { padding: .45rem .25rem; font-size: .9rem; }
             }
             @media screen and (max-width: 1023px) {
                 .header-wrapper {
@@ -372,10 +400,41 @@
                 <span>Required by the API's X-API-KEY authentication filter.</span>
             </div>
             <nav class="demo-nav" aria-label="Demo sections">
+                <a href="#system-health">System Health</a>
+                <a href="#json-inspector">JSON Inspector</a>
+                <a href="#audit-information">Audit Information</a>
                 <a href="#error-handling">Error Handling</a>
                 <a href="#input-validation">Input Validation</a>
                 <a href="#security-headers">Security Headers</a>
             </nav>
+
+            <section id="system-health" class="demo-card demo-section">
+                <h2>System Health</h2>
+                <p>Read the live SmallRye liveness and readiness probes. A confirmed DOWN response is distinguished from an unavailable endpoint or an unexpected response.</p>
+                <button class="demo-button" id="refresh-health" type="button">Refresh health checks</button>
+                <div class="health-grid">
+                    <div class="health-probe">
+                        <h3>Liveness <code>/q/health/live</code></h3>
+                        <p id="liveness-status" class="health-indicator" role="status" aria-live="polite" data-state="">Not checked yet</p>
+                        <div id="liveness-result" class="demo-result"><p>Refresh to retrieve the application liveness response.</p></div>
+                    </div>
+                    <div class="health-probe">
+                        <h3>Readiness <code>/q/health/ready</code></h3>
+                        <p id="readiness-status" class="health-indicator" role="status" aria-live="polite" data-state="">Not checked yet</p>
+                        <div id="readiness-result" class="demo-result"><p>Refresh to retrieve the application readiness response.</p></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="json-inspector" class="demo-card demo-section">
+                <h2>JSON Inspector</h2>
+                <p>Fetch the actual <code>GET /contacts</code> response and inspect its formatted JSON, date/time fields, and any null-valued properties returned by the backend.</p>
+                <button class="demo-button" id="refresh-json" type="button">Fetch contacts JSON</button>
+                <p id="json-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="json-diagnostics" class="demo-result" aria-live="polite"></div>
+                <div id="json-result" class="demo-result"><p>No API response has been fetched yet.</p></div>
+                <p>To exercise null omission, create a contact below with the optional State field blank, then refresh this response and check that no <code>state: null</code> property is returned. Use the unknown-property checkbox on the contact form to send an extra request property and verify that the backend accepts it without returning it as a Contact field.</p>
+            </section>
 
             <section id="error-handling" class="demo-card demo-section">
                 <h2>Error Handling</h2>
@@ -422,10 +481,33 @@
                             <span class="field-error" data-error-for="state"></span>
                         </div>
                     </div>
+                    <label class="demo-checkbox" for="include-unknown-property">
+                        <input id="include-unknown-property" type="checkbox">
+                        <span>Include an unknown JSON property to demonstrate backend deserialization behavior.</span>
+                    </label>
                     <button class="demo-button" id="submit-contact" type="submit">Submit contact</button>
+                    <button class="demo-button" id="cancel-contact-update" type="button" hidden>Cancel update</button>
                 </form>
                 <p id="validation-status" class="demo-status" role="status" aria-live="polite"></p>
                 <div id="validation-result" class="demo-result"></div>
+            </section>
+
+            <section id="audit-information" class="demo-card demo-section">
+                <h2>Audit Information</h2>
+                <p>Load real contacts and inspect the creation and modification timestamps returned by the API. The edit action uses the existing contact update endpoint.</p>
+                <div class="audit-controls">
+                    <button class="demo-button" id="load-contacts" type="button">Load contacts</button>
+                    <label for="audit-contact-select">Contact
+                        <select id="audit-contact-select" aria-describedby="audit-status">
+                            <option value="">Load contacts to select a record</option>
+                        </select>
+                    </label>
+                    <button class="demo-button" id="load-audit-contact" type="button">Show audit information</button>
+                </div>
+                <p id="audit-status" class="demo-status" role="status" aria-live="polite"></p>
+                <div id="audit-result" class="demo-result"><p>Select a contact and load its audit information.</p></div>
+                <button class="demo-button" id="edit-audit-contact" type="button" disabled>Edit this contact</button>
+                <p>Timestamp values and their original ISO-8601 strings are taken from the backend response. After an update, the page reloads the saved contact to show the persisted modification time.</p>
             </section>
 
             <section id="security-headers" class="demo-card demo-section">
@@ -447,6 +529,13 @@
                 var errorStatus = document.getElementById("error-status");
                 var validationStatus = document.getElementById("validation-status");
                 var headersStatus = document.getElementById("headers-status");
+                var healthButton = document.getElementById("refresh-health");
+                var jsonStatus = document.getElementById("json-status");
+                var auditStatus = document.getElementById("audit-status");
+                var auditContactSelect = document.getElementById("audit-contact-select");
+                var currentAuditContact = null;
+                var updatingContactId = null;
+                var updatingContactVersion = null;
 
                 function setStatus(element, message, state) {
                     element.textContent = message;
@@ -473,11 +562,312 @@
                     }
                 }
 
+                async function readJsonResponse(response) {
+                    var text = await response.text();
+                    if (!text) return null;
+                    try {
+                        return JSON.parse(text);
+                    } catch (error) {
+                        throw new Error("The server returned a non-JSON response.");
+                    }
+                }
+
                 function showJson(container, data) {
                     var pre = document.createElement("pre");
                     pre.textContent = JSON.stringify(data, null, 2);
                     container.replaceChildren(pre);
                 }
+
+                function showProbeResult(container, data) {
+                    container.replaceChildren();
+                    if (data && typeof data === "object") {
+                        showJson(container, data);
+                    } else {
+                        container.textContent = "No JSON response body was returned.";
+                    }
+                }
+
+                async function refreshHealthProbe(name, path, statusElement, resultElement) {
+                    setStatus(statusElement, "Checking...", "");
+                    resultElement.replaceChildren();
+                    try {
+                        var response = await fetch(path, { headers: requestHeaders(false), cache: "no-store" });
+                        var data = await readJsonResponse(response);
+                        showProbeResult(resultElement, data);
+                        var checkedAt = "Checked " + new Date().toLocaleString();
+                        if (response.status !== 200 && response.status !== 503) {
+                            setStatus(statusElement, "Request failed (HTTP " + response.status + "). " + checkedAt, "error");
+                            return;
+                        }
+                        if (!data || typeof data !== "object" || typeof data.status !== "string") {
+                            setStatus(statusElement, "Unexpected health response (HTTP " + response.status + "). " + checkedAt, "error");
+                            return;
+                        }
+                        var reportedStatus = data.status.toUpperCase();
+                        if (reportedStatus === "UP" && response.status === 200) {
+                            setStatus(statusElement, "UP (HTTP " + response.status + "). " + checkedAt, "success");
+                        } else if (reportedStatus === "DOWN") {
+                            setStatus(statusElement, "DOWN (probe reports the application is unhealthy; HTTP " + response.status + "). " + checkedAt, "down");
+                        } else {
+                            setStatus(statusElement, "Unexpected health response: " + data.status + " (HTTP " + response.status + "). " + checkedAt, "error");
+                        }
+                    } catch (error) {
+                        setStatus(statusElement, name + " check failed: " + error.message + " Check the API key, endpoint, and application availability.", "error");
+                        resultElement.textContent = "No valid health response could be read.";
+                    }
+                }
+
+                healthButton.addEventListener("click", async function () {
+                    healthButton.disabled = true;
+                    await Promise.all([
+                        refreshHealthProbe("Liveness", "/q/health/live", document.getElementById("liveness-status"), document.getElementById("liveness-result")),
+                        refreshHealthProbe("Readiness", "/q/health/ready", document.getElementById("readiness-status"), document.getElementById("readiness-result"))
+                    ]);
+                    healthButton.disabled = false;
+                });
+
+                function collectResponseDiagnostics(value) {
+                    var nullPaths = [];
+                    var dateFields = [];
+                    function visit(item, prefix) {
+                        if (!item || typeof item !== "object") return;
+                        Object.keys(item).forEach(function (key) {
+                            var path = prefix ? prefix + "." + key : key;
+                            var child = item[key];
+                            if (child === null) nullPaths.push(path);
+                            if (/date|time|At$/i.test(key) && typeof child === "string") {
+                                var isIso = /^\d{4}-\d{2}-\d{2}(?:T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})?)?$/.test(child);
+                                dateFields.push({ path: path, value: child, isIso: isIso });
+                            }
+                            visit(child, path);
+                        });
+                    }
+                    visit(value, "");
+                    return { nullPaths: nullPaths, dateFields: dateFields };
+                }
+
+                function renderJsonDiagnostics(data) {
+                    var diagnostics = document.getElementById("json-diagnostics");
+                    diagnostics.replaceChildren();
+                    var details = collectResponseDiagnostics(data);
+                    var summary = document.createElement("p");
+                    if (details.dateFields.length) {
+                        var invalidDates = details.dateFields.filter(function (field) { return !field.isIso; });
+                        summary.textContent = "Date/time values in this response: " + details.dateFields.map(function (field) { return field.path; }).join(", ") +
+                            (invalidDates.length ? ". Some values are not ISO-8601." : " — all are ISO-8601.");
+                    } else {
+                        summary.textContent = "No date/time fields were present in this response.";
+                    }
+                    diagnostics.appendChild(summary);
+                    var nullSummary = document.createElement("p");
+                    nullSummary.textContent = details.nullPaths.length
+                        ? "Null-valued properties returned: " + details.nullPaths.join(", ")
+                        : "No null-valued properties are present in this response.";
+                    diagnostics.appendChild(nullSummary);
+                }
+
+                function addContactOption(contact) {
+                    if (!contact || contact.id === undefined || contact.id === null) return;
+                    var existing = Array.prototype.find.call(auditContactSelect.options, function (option) {
+                        return option.value === String(contact.id);
+                    });
+                    if (existing) {
+                        existing.textContent = "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "");
+                    } else {
+                        var option = document.createElement("option");
+                        option.value = contact.id;
+                        option.textContent = "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "");
+                        auditContactSelect.appendChild(option);
+                    }
+                    auditContactSelect.value = String(contact.id);
+                }
+
+                function populateContactOptions(contacts) {
+                    auditContactSelect.replaceChildren();
+                    if (!Array.isArray(contacts) || contacts.length === 0) {
+                        var emptyOption = document.createElement("option");
+                        emptyOption.value = "";
+                        emptyOption.textContent = "No contacts returned by the API";
+                        auditContactSelect.appendChild(emptyOption);
+                        return;
+                    }
+                    contacts.forEach(addContactOption);
+                }
+
+                async function refreshJson() {
+                    var button = document.getElementById("refresh-json");
+                    var result = document.getElementById("json-result");
+                    var diagnostics = document.getElementById("json-diagnostics");
+                    button.disabled = true;
+                    result.replaceChildren();
+                    diagnostics.replaceChildren();
+                    setStatus(jsonStatus, "Fetching GET /contacts...", "");
+                    try {
+                        var response = await fetch("/contacts", { headers: requestHeaders(false), cache: "no-store" });
+                        var data = await readJsonResponse(response);
+                        if (!response.ok) {
+                            showProbeResult(result, data);
+                            setStatus(jsonStatus, "Request failed (HTTP " + response.status + "). Check the API key and response details.", "error");
+                            diagnostics.replaceChildren();
+                            return;
+                        }
+                        if (!Array.isArray(data)) {
+                            showProbeResult(result, data);
+                            throw new Error("GET /contacts returned an unexpected response shape; expected a JSON array.");
+                        }
+                        showJson(result, data);
+                        renderJsonDiagnostics(data);
+                        populateContactOptions(data);
+                        setStatus(jsonStatus, "Actual GET /contacts response received (HTTP " + response.status + ", " + data.length + " contact(s)).", "success");
+                    } catch (error) {
+                        setStatus(jsonStatus, "Could not inspect contacts: " + error.message, "error");
+                        if (!result.textContent) result.textContent = "No valid JSON response could be read.";
+                        diagnostics.replaceChildren();
+                    } finally {
+                        button.disabled = false;
+                    }
+                }
+
+                document.getElementById("refresh-json").addEventListener("click", refreshJson);
+
+                function displayTimestamp(value) {
+                    var cell = document.createElement("td");
+                    if (typeof value !== "string" || !value) {
+                        cell.textContent = "Not returned by the backend";
+                        return cell;
+                    }
+                    var parsed = new Date(value);
+                    if (!Number.isNaN(parsed.getTime())) {
+                        var time = document.createElement("time");
+                        time.dateTime = value;
+                        time.textContent = parsed.toLocaleString();
+                        cell.appendChild(time);
+                        cell.appendChild(document.createElement("br"));
+                    }
+                    var raw = document.createElement("code");
+                    raw.className = "audit-raw";
+                    raw.textContent = value;
+                    cell.appendChild(raw);
+                    return cell;
+                }
+
+                function renderAudit(contact) {
+                    currentAuditContact = contact;
+                    var result = document.getElementById("audit-result");
+                    result.replaceChildren();
+                    if (!contact || typeof contact !== "object") {
+                        result.textContent = "The API did not return a contact record.";
+                        document.getElementById("edit-audit-contact").disabled = true;
+                        return;
+                    }
+                    addContactOption(contact);
+                    var table = document.createElement("table");
+                    table.className = "audit-table";
+                    var body = document.createElement("tbody");
+                    [
+                        ["Contact", "#" + contact.id + " — " + (contact.firstName || "") + " " + (contact.lastName || "")],
+                        ["Created at", contact.createdAt],
+                        ["Updated at", contact.updatedAt]
+                    ].forEach(function (entry) {
+                        var row = document.createElement("tr");
+                        var heading = document.createElement("th");
+                        heading.scope = "row";
+                        heading.textContent = entry[0];
+                        row.appendChild(heading);
+                        row.appendChild(entry[0].endsWith("at") ? displayTimestamp(entry[1]) : document.createElement("td"));
+                        if (entry[0] === "Contact") row.lastChild.textContent = entry[1];
+                        body.appendChild(row);
+                    });
+                    table.appendChild(body);
+                    result.appendChild(table);
+                    var heading = document.createElement("h3");
+                    heading.textContent = "Backend contact response";
+                    result.appendChild(heading);
+                    var jsonContainer = document.createElement("div");
+                    result.appendChild(jsonContainer);
+                    showJson(jsonContainer, contact);
+                    document.getElementById("edit-audit-contact").disabled = contact.id === undefined || contact.id === null;
+                }
+
+                async function loadAuditContact() {
+                    var id = auditContactSelect.value;
+                    if (!id) {
+                        setStatus(auditStatus, "Load contacts and select a record first.", "error");
+                        return null;
+                    }
+                    var button = document.getElementById("load-audit-contact");
+                    button.disabled = true;
+                    setStatus(auditStatus, "Fetching GET /contacts/" + id + "...", "");
+                    try {
+                        var response = await fetch("/contacts/" + encodeURIComponent(id), { headers: requestHeaders(false), cache: "no-store" });
+                        var data = await readJsonResponse(response);
+                        if (!response.ok) {
+                            showProbeResult(document.getElementById("audit-result"), data);
+                            setStatus(auditStatus, "Could not load contact (HTTP " + response.status + ").", "error");
+                            return null;
+                        }
+                        if (!data || typeof data !== "object" || String(data.id) !== String(id)) {
+                            throw new Error("The API returned an unexpected contact record.");
+                        }
+                        renderAudit(data);
+                        setStatus(auditStatus, "Audit information loaded from GET /contacts/" + id + ".", "success");
+                        return data;
+                    } catch (error) {
+                        setStatus(auditStatus, "Could not load audit information: " + error.message, "error");
+                        return null;
+                    } finally {
+                        button.disabled = false;
+                    }
+                }
+
+                document.getElementById("load-contacts").addEventListener("click", async function () {
+                    var button = this;
+                    button.disabled = true;
+                    setStatus(auditStatus, "Loading contacts...", "");
+                    try {
+                        var response = await fetch("/contacts", { headers: requestHeaders(false), cache: "no-store" });
+                        var data = await readJsonResponse(response);
+                        if (!response.ok) throw new Error("HTTP " + response.status);
+                        if (!Array.isArray(data)) throw new Error("Unexpected response: expected a JSON array.");
+                        populateContactOptions(data);
+                        setStatus(auditStatus, data.length ? data.length + " contact(s) loaded from the backend." : "The backend returned no contacts yet.", data.length ? "success" : "");
+                    } catch (error) {
+                        setStatus(auditStatus, "Could not load contacts: " + error.message, "error");
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+                document.getElementById("load-audit-contact").addEventListener("click", loadAuditContact);
+
+                document.getElementById("edit-audit-contact").addEventListener("click", function () {
+                    if (!currentAuditContact) return;
+                    updatingContactId = currentAuditContact.id;
+                    updatingContactVersion = currentAuditContact.version;
+                    ["firstName", "lastName", "email", "phoneNumber", "state"].forEach(function (field) {
+                        document.getElementById(field).value = currentAuditContact[field] || "";
+                    });
+                    var birthDate = currentAuditContact.birthDate;
+                    document.getElementById("birthDate").value = typeof birthDate === "string" ? birthDate.substring(0, 10) : "";
+                    document.getElementById("submit-contact").textContent = "Update contact #" + updatingContactId;
+                    document.getElementById("cancel-contact-update").hidden = false;
+                    setStatus(validationStatus, "Editing contact #" + updatingContactId + ". Submit to send PUT /contacts/" + updatingContactId + ".", "");
+                    document.getElementById("input-validation").scrollIntoView({ behavior: "smooth" });
+                });
+
+                function resetContactFormMode() {
+                    updatingContactId = null;
+                    updatingContactVersion = null;
+                    document.getElementById("contact-form").reset();
+                    document.getElementById("submit-contact").textContent = "Submit contact";
+                    document.getElementById("cancel-contact-update").hidden = true;
+                    document.getElementById("include-unknown-property").checked = false;
+                    document.querySelectorAll(".field-error").forEach(function (element) { element.textContent = ""; });
+                }
+
+                document.getElementById("cancel-contact-update").addEventListener("click", function () {
+                    resetContactFormMode();
+                    setStatus(validationStatus, "Update cancelled.", "");
+                });
 
                 async function runErrorDemo(path) {
                     var button500 = document.getElementById("trigger-500");
@@ -541,10 +931,20 @@
                         birthDate: birthDate ? new Date(birthDate + "T00:00:00Z").toISOString() : null,
                         state: formData.get("state") || null
                     };
+                    var isUpdate = updatingContactId !== null;
+                    if (isUpdate) {
+                        payload.id = updatingContactId;
+                        if (updatingContactVersion !== null && updatingContactVersion !== undefined) {
+                            payload.version = updatingContactVersion;
+                        }
+                    }
+                    if (document.getElementById("include-unknown-property").checked) {
+                        payload.uiUnknownProperty = "This property is intentionally not part of the Contact model";
+                    }
 
                     try {
-                        var response = await fetch("/contacts", {
-                            method: "POST",
+                        var response = await fetch(isUpdate ? "/contacts/" + encodeURIComponent(updatingContactId) : "/contacts", {
+                            method: isUpdate ? "PUT" : "POST",
                             headers: requestHeaders(true),
                             body: JSON.stringify(payload)
                         });
@@ -570,7 +970,19 @@
                             if (target) target.textContent = reasons[path];
                         });
                         if (response.ok) {
-                            setStatus(validationStatus, "Contact created successfully (HTTP " + response.status + ").", "success");
+                            var operation = isUpdate ? "updated" : "created";
+                            var unknownPropertyCheck = document.getElementById("include-unknown-property").checked &&
+                                data && !Object.prototype.hasOwnProperty.call(data, "uiUnknownProperty");
+                            setStatus(validationStatus, "Contact " + operation + " successfully (HTTP " + response.status + ")." +
+                                (unknownPropertyCheck ? " The unknown property was accepted and ignored by the backend." : ""), "success");
+                            if (isUpdate && data && data.id !== undefined) {
+                                auditContactSelect.value = String(data.id);
+                                resetContactFormMode();
+                                await loadAuditContact();
+                            } else if (data && data.id !== undefined) {
+                                renderAudit(data);
+                                setStatus(auditStatus, "New contact response loaded. Created/updated timestamps shown here came from the backend.", "success");
+                            }
                         } else {
                             var message = data && (data.message || data.title || data.error) ? (data.message || data.title || data.error) : "The request failed. Check the API key and response below.";
                             setStatus(validationStatus, "HTTP " + response.status + " — " + message, "error");
