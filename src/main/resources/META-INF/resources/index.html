@@ -216,6 +216,7 @@
             .security-table th { background: #f4f6f8; }
             .security-present { color: #167345; font-weight: 600; }
             .security-missing { color: #a12622; font-weight: 600; }
+<<<<<<< HEAD
             .health-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
@@ -243,11 +244,16 @@
             .demo-checkbox { display: flex; align-items: flex-start; gap: .5rem; margin: .75rem 0; }
             .demo-checkbox input { margin-top: .25rem; }
             .demo-button[hidden] { display: none; }
+=======
+>>>>>>> origin/main
             @media screen and (max-width: 600px) {
                 .demo-wrapper { padding: 1rem; }
                 .demo-card { padding: 1rem; }
                 .security-table th, .security-table td { padding: .45rem .25rem; font-size: .9rem; }
+<<<<<<< HEAD
                 .audit-table th, .audit-table td { padding: .45rem .25rem; font-size: .9rem; }
+=======
+>>>>>>> origin/main
             }
             @media screen and (max-width: 1023px) {
                 .header-wrapper {
@@ -400,14 +406,18 @@
                 <span>Required by the API's X-API-KEY authentication filter.</span>
             </div>
             <nav class="demo-nav" aria-label="Demo sections">
+<<<<<<< HEAD
                 <a href="#system-health">System Health</a>
                 <a href="#json-inspector">JSON Inspector</a>
                 <a href="#audit-information">Audit Information</a>
+=======
+>>>>>>> origin/main
                 <a href="#error-handling">Error Handling</a>
                 <a href="#input-validation">Input Validation</a>
                 <a href="#security-headers">Security Headers</a>
             </nav>
 
+<<<<<<< HEAD
             <section id="system-health" class="demo-card demo-section">
                 <h2>System Health</h2>
                 <p>Read the live SmallRye liveness and readiness probes. A confirmed DOWN response is distinguished from an unavailable endpoint or an unexpected response.</p>
@@ -436,6 +446,8 @@
                 <p>To exercise null omission, create a contact below with the optional State field blank, then refresh this response and check that no <code>state: null</code> property is returned. Use the unknown-property checkbox on the contact form to send an extra request property and verify that the backend accepts it without returning it as a Contact field.</p>
             </section>
 
+=======
+>>>>>>> origin/main
             <section id="error-handling" class="demo-card demo-section">
                 <h2>Error Handling</h2>
                 <p>Trigger an unexpected server error or request a contact that does not exist. The response is shown as structured JSON without exposing an internal stack trace.</p>
@@ -481,17 +493,22 @@
                             <span class="field-error" data-error-for="state"></span>
                         </div>
                     </div>
+<<<<<<< HEAD
                     <label class="demo-checkbox" for="include-unknown-property">
                         <input id="include-unknown-property" type="checkbox">
                         <span>Include an unknown JSON property to demonstrate backend deserialization behavior.</span>
                     </label>
                     <button class="demo-button" id="submit-contact" type="submit">Submit contact</button>
                     <button class="demo-button" id="cancel-contact-update" type="button" hidden>Cancel update</button>
+=======
+                    <button class="demo-button" id="submit-contact" type="submit">Submit contact</button>
+>>>>>>> origin/main
                 </form>
                 <p id="validation-status" class="demo-status" role="status" aria-live="polite"></p>
                 <div id="validation-result" class="demo-result"></div>
             </section>
 
+<<<<<<< HEAD
             <section id="audit-information" class="demo-card demo-section">
                 <h2>Audit Information</h2>
                 <p>Load real contacts and inspect the creation and modification timestamps returned by the API. The edit action uses the existing contact update endpoint.</p>
@@ -510,6 +527,8 @@
                 <p>Timestamp values and their original ISO-8601 strings are taken from the backend response. After an update, the page reloads the saved contact to show the persisted modification time.</p>
             </section>
 
+=======
+>>>>>>> origin/main
             <section id="security-headers" class="demo-card demo-section">
                 <h2>Security Headers</h2>
                 <p>Send a fresh request to <code>GET /contacts</code> and compare its response headers with the values configured by the backend.</p>
@@ -529,6 +548,7 @@
                 var errorStatus = document.getElementById("error-status");
                 var validationStatus = document.getElementById("validation-status");
                 var headersStatus = document.getElementById("headers-status");
+<<<<<<< HEAD
                 var healthButton = document.getElementById("refresh-health");
                 var jsonStatus = document.getElementById("json-status");
                 var auditStatus = document.getElementById("audit-status");
@@ -536,6 +556,8 @@
                 var currentAuditContact = null;
                 var updatingContactId = null;
                 var updatingContactVersion = null;
+=======
+>>>>>>> origin/main
 
                 function setStatus(element, message, state) {
                     element.textContent = message;
@@ -562,6 +584,7 @@
                     }
                 }
 
+<<<<<<< HEAD
                 async function readJsonResponse(response) {
                     var text = await response.text();
                     if (!text) return null;
@@ -572,12 +595,15 @@
                     }
                 }
 
+=======
+>>>>>>> origin/main
                 function showJson(container, data) {
                     var pre = document.createElement("pre");
                     pre.textContent = JSON.stringify(data, null, 2);
                     container.replaceChildren(pre);
                 }
 
+<<<<<<< HEAD
                 function showProbeResult(container, data) {
                     container.replaceChildren();
                     if (data && typeof data === "object") {
@@ -869,6 +895,8 @@
                     setStatus(validationStatus, "Update cancelled.", "");
                 });
 
+=======
+>>>>>>> origin/main
                 async function runErrorDemo(path) {
                     var button500 = document.getElementById("trigger-500");
                     var button404 = document.getElementById("trigger-404");
@@ -931,6 +959,7 @@
                         birthDate: birthDate ? new Date(birthDate + "T00:00:00Z").toISOString() : null,
                         state: formData.get("state") || null
                     };
+<<<<<<< HEAD
                     var isUpdate = updatingContactId !== null;
                     if (isUpdate) {
                         payload.id = updatingContactId;
@@ -945,6 +974,12 @@
                     try {
                         var response = await fetch(isUpdate ? "/contacts/" + encodeURIComponent(updatingContactId) : "/contacts", {
                             method: isUpdate ? "PUT" : "POST",
+=======
+
+                    try {
+                        var response = await fetch("/contacts", {
+                            method: "POST",
+>>>>>>> origin/main
                             headers: requestHeaders(true),
                             body: JSON.stringify(payload)
                         });
@@ -970,6 +1005,7 @@
                             if (target) target.textContent = reasons[path];
                         });
                         if (response.ok) {
+<<<<<<< HEAD
                             var operation = isUpdate ? "updated" : "created";
                             var unknownPropertyCheck = document.getElementById("include-unknown-property").checked &&
                                 data && !Object.prototype.hasOwnProperty.call(data, "uiUnknownProperty");
@@ -983,6 +1019,9 @@
                                 renderAudit(data);
                                 setStatus(auditStatus, "New contact response loaded. Created/updated timestamps shown here came from the backend.", "success");
                             }
+=======
+                            setStatus(validationStatus, "Contact created successfully (HTTP " + response.status + ").", "success");
+>>>>>>> origin/main
                         } else {
                             var message = data && (data.message || data.title || data.error) ? (data.message || data.title || data.error) : "The request failed. Check the API key and response below.";
                             setStatus(validationStatus, "HTTP " + response.status + " — " + message, "error");

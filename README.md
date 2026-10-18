@@ -30,6 +30,7 @@ Run the focused backend coverage for these demos with:
 ```shell
 ./mvnw -Dtest=ErrorDemoRestServiceTest test
 ```
+<<<<<<< HEAD
 
 ## Health, JSON serialization, and entity audit demos
 
@@ -40,3 +41,5 @@ Start the application in dev mode and open [http://localhost:8080/](http://local
 - **Audit Information:** Select **Load contacts**, choose a returned contact, and select **Show audit information**. The creation and modification values are read from `GET /contacts/{id}`; each displays a localized time and the original backend ISO-8601 value. To verify modification auditing, select **Edit this contact**, change a valid field, and submit the form. This sends the existing `PUT /contacts/{id}` request, then reloads the saved contact so its persisted `updatedAt` value can be inspected. `createdAt` should remain unchanged.
 
 All demonstrations use the running application's real endpoints and response bodies; the UI does not generate health results, entity audit timestamps, or JSON examples.
+=======
+>>>>>>> origin/main
