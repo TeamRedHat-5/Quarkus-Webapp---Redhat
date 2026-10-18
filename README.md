@@ -30,3 +30,16 @@ Run the focused backend coverage for these demos with:
 ```shell
 ./mvnw -Dtest=ErrorDemoRestServiceTest test
 ```
+<<<<<<< HEAD
+
+## Health, JSON serialization, and entity audit demos
+
+Start the application in dev mode and open [http://localhost:8080/](http://localhost:8080/). Enter the configured API key (`API_KEY`, or `change-me` with the default local configuration); the page sends it with health and API requests and does not save it.
+
+- **System Health:** Select **Refresh health checks** to request `/q/health/live` and `/q/health/ready`. The page shows each probe's actual JSON response and check time. A valid `DOWN` probe result is shown separately from authentication failures, network errors, and unexpected HTTP responses.
+- **JSON Inspector:** Select **Fetch contacts JSON** to retrieve and pretty-print the live `GET /contacts` response. The diagnostics report date/time fields and any null-valued properties that the server actually returned. To exercise null omission, create a contact with the optional State field blank using the existing form, then refresh the inspector and confirm its response has no `state: null`. To exercise unknown-property handling, select **Include an unknown JSON property** on the form and submit valid contact details; the successful response should contain the Contact fields but not `uiUnknownProperty`.
+- **Audit Information:** Select **Load contacts**, choose a returned contact, and select **Show audit information**. The creation and modification values are read from `GET /contacts/{id}`; each displays a localized time and the original backend ISO-8601 value. To verify modification auditing, select **Edit this contact**, change a valid field, and submit the form. This sends the existing `PUT /contacts/{id}` request, then reloads the saved contact so its persisted `updatedAt` value can be inspected. `createdAt` should remain unchanged.
+
+All demonstrations use the running application's real endpoints and response bodies; the UI does not generate health results, entity audit timestamps, or JSON examples.
+=======
+>>>>>>> origin/main
